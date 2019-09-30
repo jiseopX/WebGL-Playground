@@ -1,10 +1,10 @@
+
+// THREE START
 global.THREE = require('three');
 const createLoop = require('raf-loop');
 const EffectComposer = require('three-effectcomposer')(THREE);
 const glslify = require('glslify');
-const fragment = require('./lut.frag')
-const vertex = require('./pass.vert')
-console.log(fragment)
+
 
 //import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 //import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
@@ -13,7 +13,8 @@ console.log(fragment)
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-400, 400, 225, -225);
 const renderer = new THREE.WebGLRenderer();
-const videoContainer = document.getElementById('video-container');
+const videoContainer = document.getElementById('three-container');
+console.log(videoContainer)
 videoContainer.appendChild(renderer.domElement);
 renderer.setSize(800, 450);
 const video = document.getElementById('video');
@@ -43,8 +44,28 @@ composer.addPass(new EffectComposer.RenderPass(scene, camera));
 
 
 const lut = new EffectComposer.ShaderPass({
-  vertexShader: glslify(vertex),
-  fragmentShader: glslify(fragment),
+  vertexShader: glslify(`
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  `),
+  fragmentShader: glslify(`
+  precision mediump float;
+  #define LUT_FLIP_Y
+
+  varying vec2 vUv;
+  uniform sampler2D tDiffuse;
+  uniform sampler2D tLookup;
+
+  #pragma glslify: lut = require('glsl-lut')
+
+  void main () {
+    gl_FragColor = texture2D(tDiffuse, vUv);
+    gl_FragColor.rgb = lut(gl_FragColor, tLookup).rgb;
+  }
+`),
   uniforms: {
     tDiffuse: { type: 't', value: new THREE.Texture() },
     tLookup: { type: 't', value: new THREE.Texture() }
@@ -78,3 +99,4 @@ const stopButton = document.getElementById('pause');
 stopButton.onclick = () => {
   video.pause();
 };
+// THREE END
