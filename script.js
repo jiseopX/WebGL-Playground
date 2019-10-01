@@ -1,10 +1,8 @@
-
 // THREE START
-global.THREE = require('three');
-const createLoop = require('raf-loop');
-const EffectComposer = require('three-effectcomposer')(THREE);
-const glslify = require('glslify');
-
+global.THREE = require("three");
+const createLoop = require("raf-loop");
+const EffectComposer = require("three-effectcomposer")(THREE);
+const glslify = require("glslify");
 
 //import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 //import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
@@ -13,18 +11,17 @@ const glslify = require('glslify');
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-400, 400, 225, -225);
 const renderer = new THREE.WebGLRenderer();
-const videoContainer = document.getElementById('three-container');
-console.log(videoContainer)
-videoContainer.appendChild(renderer.domElement);
+const threeContainer = document.getElementById("three-container");
+threeContainer.appendChild(renderer.domElement);
 renderer.setSize(800, 450);
-const video = document.getElementById('video');
+const video = document.getElementById("video");
 
 const geometry = new THREE.PlaneGeometry(800, 450);
-const texture = new THREE.VideoTexture(video);
-texture.minFilter = THREE.LinearFilter
+const Texture = new THREE.VideoTexture(video);
+Texture.minFilter = THREE.LinearFilter;
 const material = new THREE.MeshBasicMaterial({
   color: 0xffffff,
-  map: texture,
+  map: Texture
 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
@@ -41,7 +38,6 @@ target.texture.generateMipmaps = false;
 const composer = new EffectComposer(renderer, target);
 
 composer.addPass(new EffectComposer.RenderPass(scene, camera));
-
 
 const lut = new EffectComposer.ShaderPass({
   vertexShader: glslify(`
@@ -67,36 +63,61 @@ const lut = new EffectComposer.ShaderPass({
   }
 `),
   uniforms: {
-    tDiffuse: { type: 't', value: new THREE.Texture() },
-    tLookup: { type: 't', value: new THREE.Texture() }
+    tDiffuse: { type: "t", value: new THREE.Texture() },
+    tLookup: { type: "t", value: new THREE.Texture() }
   }
 });
 composer.addPass(lut);
 
-const tLookup = new THREE.TextureLoader().load('mercury.png');
+const tLookup = new THREE.TextureLoader().load("mercury.png");
 tLookup.generateMipmaps = false;
 tLookup.minFilter = THREE.LinearFilter;
 lut.uniforms.tLookup.value = tLookup;
 
 composer.passes[composer.passes.length - 1].renderToScreen = true;
 
-
 createLoop(() => {
   composer.passes.forEach(pass => {
     if (pass.uniforms && pass.uniforms.resolution) {
-      pass.uniforms.resolution.value.set(
-        800, 450
-      );
+      pass.uniforms.resolution.value.set(800, 450);
     }
   });
   composer.render();
 }).start();
 
-
-const playButton = document.getElementById('play');
+const playButton = document.getElementById("play");
 playButton.onclick = () => video.play();
-const stopButton = document.getElementById('pause');
+const stopButton = document.getElementById("pause");
 stopButton.onclick = () => {
   video.pause();
 };
 // THREE END
+//
+//
+//
+// PIXI START
+import * as PIXI from 'pixi.js';
+import { ColorMapFilter } from '@pixi/filter-color-map';
+
+const pixiRenderer = PIXI.autoDetectRenderer({ width: 800, height: 450 })
+const pixiStage = new PIXI.Container();
+const pixiDiv = document.getElementById("pixi-container");
+pixiDiv.appendChild(pixiRenderer.view);
+const pixiTexture = PIXI.Texture.from(video);
+const pixiVideoSprite = new PIXI.Sprite(pixiTexture);
+pixiVideoSprite.width = pixiRenderer.width;
+pixiVideoSprite.height = pixiRenderer.height;
+pixiStage.addChild(pixiVideoSprite);
+
+//FILTER START
+animate();
+
+function animate() {
+
+  // render the stage
+  pixiRenderer.render(pixiStage);
+
+  requestAnimationFrame(animate);
+}
+//FILTER END
+
