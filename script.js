@@ -95,29 +95,29 @@ stopButton.onclick = () => {
 //
 //
 //
-// PIXI START
-import * as PIXI from 'pixi.js';
-import { ColorMapFilter } from '@pixi/filter-color-map';
+// THREE RAW START
 
-const pixiRenderer = PIXI.autoDetectRenderer({ width: 800, height: 450 })
-const pixiStage = new PIXI.Container();
-const pixiDiv = document.getElementById("pixi-container");
-pixiDiv.appendChild(pixiRenderer.view);
-const pixiTexture = PIXI.Texture.from(video);
-const pixiVideoSprite = new PIXI.Sprite(pixiTexture);
-pixiVideoSprite.width = pixiRenderer.width;
-pixiVideoSprite.height = pixiRenderer.height;
-pixiStage.addChild(pixiVideoSprite);
+const sceneRaw = new THREE.Scene();
+const cameraRaw = new THREE.OrthographicCamera(-400, 400, 225, -225);
+const rendererRaw = new THREE.WebGLRenderer();
+const thrawContainer = document.getElementById("thraw-container");
+thrawContainer.appendChild(rendererRaw.domElement);
+rendererRaw.setSize(800, 450);
 
-//FILTER START
-animate();
+const geometryRaw = new THREE.PlaneGeometry(800, 450);
+const TextureRaw = new THREE.VideoTexture(video);
+TextureRaw.minFilter = THREE.LinearFilter;
+const materialRaw = new THREE.MeshBasicMaterial({
+  color: 0xffffff,
+  map: TextureRaw
+});
+const meshRaw = new THREE.Mesh(geometryRaw, materialRaw);
+sceneRaw.add(meshRaw);
+//TODO: add light!
+meshRaw.position.z = -1;
 
 function animate() {
-
-  // render the stage
-  pixiRenderer.render(pixiStage);
-
   requestAnimationFrame(animate);
+  rendererRaw.render(sceneRaw, cameraRaw);
 }
-//FILTER END
-
+animate();
