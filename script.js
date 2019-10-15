@@ -1,7 +1,12 @@
 // THREE START
-global.THREE = require("three");
+import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import * as e2c from 'electron-to-chromium';
+var versions = e2c.fullVersions;
+console.log(versions['5.0.0']);
 const createLoop = require("raf-loop");
-const EffectComposer = require("three-effectcomposer")(THREE);
 const glslify = require("glslify");
 
 //import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
@@ -29,7 +34,7 @@ scene.add(mesh);
 mesh.position.z = -1;
 
 const target = new THREE.WebGLRenderTarget(800, 450);
-target.texture.stencil = false;
+//target.texture.stencil = false;
 target.texture.minFilter = THREE.LinearFilter;
 target.texture.magFilter = THREE.LinearFilter;
 target.texture.format = THREE.RGBFormat;
@@ -37,9 +42,9 @@ target.texture.generateMipmaps = false;
 
 const composer = new EffectComposer(renderer, target);
 
-composer.addPass(new EffectComposer.RenderPass(scene, camera));
+composer.addPass(new RenderPass(scene, camera));
 
-const lut = new EffectComposer.ShaderPass({
+const lut = new ShaderPass({
   vertexShader: glslify(`
   varying vec2 vUv;
   void main() {
