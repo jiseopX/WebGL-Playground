@@ -5,15 +5,41 @@
   <body>
     <input type="button" value="play" id="play" />
     <input type="button" value="pause" id="pause" />
-    <input type="button" value="colorize" id="colorize" />
-    <h3>raw - Three.JS</h3>
-    <div id="thraw-container"></div>
-    <h3>filtered - Three.JS</h3>
-    <div id="three-container"></div>
-    <h3>raw</h3>
-    <video crossorigin="anonymous" width="800" height="450" id="video">
-      <source src="superSon.mp4" />
-    </video>
+    <div>
+      <p>upload filter</p>
+      <input
+        type="file"
+        value="upload filter"
+        id="upload-filter"
+        accept=".png"
+      />
+    </div>
+    <div>
+      <p>upload video</p>
+      <input
+        type="file"
+        value="upload video"
+        id="upload-video"
+        accept=".mov, .mp4, .avi"
+      />
+    </div>
+    <div style="flex-direction: row; display: flex;">
+      <div>
+        <h3>raw</h3>
+        <video
+          crossorigin="anonymous"
+          width="640"
+          height="360"
+          id="video"
+          src="superSon.mp4"
+        ></video>
+      </div>
+      <div>
+        <h3>filtered</h3>
+        <canvas width="640" height="360" id="gl-canvas"></canvas>
+      </div>
+    </div>
+
     <script type="text/javascript" src="dist/bundle.js"></script>
   </body>
 </html>
