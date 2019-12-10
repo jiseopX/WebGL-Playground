@@ -4,8 +4,6 @@ import VertexShader from './lut.vert';
 import Triangle from 'a-big-triangle'
 import createContext from 'gl-context'
 import createTex2d from 'gl-texture2d'
-import glslify from 'glslify'
-import lena from 'lena'
 import createShader from 'gl-shader'
 
 const createLoop = require("raf-loop");
@@ -14,20 +12,28 @@ const playButton = document.getElementById("play");
 const stopButton = document.getElementById("pause");
 const uploadFilterButton = document.getElementById("upload-filter");
 const uploadVideoButton = document.getElementById("upload-video");
+const video = document.getElementById("video");
+var lookupTexture;
+var tex;
+var shader;
+var gl;
+video.addEventListener('loadeddata', function () {
+  // Video is loaded and can be played
+  console.log(`video`, video)
+  const canvas = document.getElementById("gl-canvas");
+  lookupTexture = getTex2D("mercury.png");
+  gl = createContext(canvas, render)
+  tex = createTex2d(gl, video)
+  shader = createShader(gl,
+    VertexShader, FragmentShader
+  )
 
-const canvas = document.getElementById("gl-canvas");
-var gl = createContext(canvas, render)
-var tex = createTex2d(gl, lena)
-var lookupTexture = getTex2D("mercury.png");
-var shader = createShader(gl,
-  VertexShader, FragmentShader
-)
-console.log(`lena\n`, lena)
+  initButtons();
+  if (gl === null) {
+    alert('no init')
+  }
+}, false);
 
-initButtons();
-if (gl === null) {
-  alert('no init')
-}
 
 
 
