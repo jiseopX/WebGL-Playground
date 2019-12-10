@@ -1,14 +1,17 @@
 precision mediump float;
 
-#define LUT_FLIP_Y
-
+uniform sampler2D uTexture;
+uniform sampler2D uLookup;
+uniform float stop;
 varying vec2 vUv;
-uniform sampler2D tDiffuse;
-uniform sampler2D tLookup;
 
-#pragma glslify: lut = require('glsl-lut')
+#pragma glslify: transform = require('glsl-lut')
 
-void main () {
-  gl_FragColor = texture2D(tDiffuse, vUv);
-  gl_FragColor.rgb = lut(gl_FragColor, tLookup).rgb;
+void main() {
+	vec4 color = texture2D(uTexture, vUv);
+
+	if (vUv.x > stop)
+		gl_FragColor = transform(color, uLookup);
+	else 
+		gl_FragColor = color;
 }
