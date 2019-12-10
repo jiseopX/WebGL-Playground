@@ -1,12 +1,3 @@
-precision mediump float;
-#define GLSLIFY 1
-
-#define LUT_FLIP_Y
-
-varying vec2 vUv;
-uniform sampler2D tDiffuse;
-uniform sampler2D tLookup;
-
 vec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {
     #ifndef LUT_NO_CLAMP
         textureColor = clamp(textureColor, 0.0, 1.0);
@@ -45,7 +36,4 @@ vec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {
     return newColor;
 }
 
-void main () {
-  gl_FragColor = texture2D(tDiffuse, vUv);
-  gl_FragColor.rgb = lookup(gl_FragColor, tLookup).rgb;
-}
+#pragma glslify: export(lookup)

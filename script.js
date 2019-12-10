@@ -1,11 +1,12 @@
 
-import FragmentShader from './lutCompiled.frag';
+import FragmentShader from './lut.frag';
 import VertexShader from './lut.vert';
 import Triangle from 'a-big-triangle'
 import createContext from 'gl-context'
 import createTex2d from 'gl-texture2d'
 import glslify from 'glslify'
 import lena from 'lena'
+import createShader from 'gl-shader'
 
 const createLoop = require("raf-loop");
 
@@ -18,10 +19,10 @@ const canvas = document.getElementById("gl-canvas");
 var gl = createContext(canvas, render)
 var tex = createTex2d(gl, lena)
 var lookupTexture = getTex2D("mercury.png");
-var shader = require('gl-shader')(gl,
-  glslify(VertexShader), glslify(FragmentShader)
+var shader = createShader(gl,
+  VertexShader, FragmentShader
 )
-
+console.log(`lena\n`, lena)
 
 initButtons();
 if (gl === null) {
