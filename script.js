@@ -13,26 +13,32 @@ const stopButton = document.getElementById("pause");
 const uploadFilterButton = document.getElementById("upload-filter");
 const uploadVideoButton = document.getElementById("upload-video");
 const video = document.getElementById("video");
+const canvas = document.getElementById("gl-canvas");
 var lookupTexture;
 var tex;
 var shader;
 var gl;
 video.addEventListener('loadeddata', function () {
-  // Video is loaded and can be played
-  console.log(`video`, video)
-  const canvas = document.getElementById("gl-canvas");
+
   lookupTexture = getTex2D("mercury.png");
   gl = createContext(canvas, render)
-  tex = createTex2d(gl, video)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   shader = createShader(gl,
     VertexShader, FragmentShader
   )
+  createLoop(() => {
+    tex = createTex2d(gl, video)
+  }).start();
+
 
   initButtons();
   if (gl === null) {
     alert('no init')
   }
 }, false);
+
 
 
 
