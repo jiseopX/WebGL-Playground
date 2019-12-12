@@ -41,8 +41,13 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
   applyFilter(index)
+
   createLoop(() => {
     const videoTexture = createTex2d(gls[index], videos[index])
+    if (gls[index]) {
+      videoTexture.minFilter = gls[index].LINEAR
+      videoTexture.magFilter = gls[index].LINEAR
+    }
     videoTextures[index] ? (videoTextures[index] = videoTexture) :
       videoTextures.push(videoTexture)
   }).start();
@@ -52,8 +57,6 @@ function onVideoLoaded(index) {
     VertexShader, FragmentShader
   )
   shaders.push(shader);
-  console.log('shader\n', shader)
-
 
   if (index === 0) {
     initButtons();
@@ -92,6 +95,7 @@ function uploadVideo(e) {
 
     newDiv.style.display = 'flex'
     newDiv.style.flexDirection = 'row'
+    newDiv.style.marginTop = '20px'
 
     videos.push(newVideo)
     canvases.push(newCanvas)

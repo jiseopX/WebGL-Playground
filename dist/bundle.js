@@ -9949,8 +9949,13 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
   applyFilter(index)
+
   createLoop(() => {
     const videoTexture = gl_texture2d__WEBPACK_IMPORTED_MODULE_4___default()(gls[index], videos[index])
+    if (gls[index]) {
+      videoTexture.minFilter = gls[index].LINEAR
+      videoTexture.magFilter = gls[index].LINEAR
+    }
     videoTextures[index] ? (videoTextures[index] = videoTexture) :
       videoTextures.push(videoTexture)
   }).start();
@@ -10000,6 +10005,7 @@ function uploadVideo(e) {
 
     newDiv.style.display = 'flex'
     newDiv.style.flexDirection = 'row'
+    newDiv.style.marginTop = '20px'
 
     videos.push(newVideo)
     canvases.push(newCanvas)
