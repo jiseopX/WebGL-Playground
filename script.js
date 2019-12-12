@@ -13,21 +13,36 @@ const stopButton = document.getElementById("pause");
 const uploadFilterButton = document.getElementById("upload-filter");
 const uploadVideoButton = document.getElementById("upload-video");
 const video = document.getElementById("video");
+
 const canvas = document.getElementById("gl-canvas");
 var lookupTexture;
 var tex;
 var shader;
 var gl;
 video.addEventListener('loadeddata', function () {
-
-  lookupTexture = getTex2D("mercury.png");
+  const videoStyle = window.getComputedStyle(video)
+  const vWidth = parseInt(videoStyle.width, 10);
+  const vHeight = parseInt(videoStyle.height, 10)
+  console.log(`${vWidth} X ${vHeight}`)
+  if (vWidth > vHeight) {
+    video.setAttribute('width', '640px');
+    video.setAttribute('height', `${640 * vHeight / vWidth}px`)
+    canvas.setAttribute('width', `640px`)
+    canvas.setAttribute('height', `${640 * vHeight / vWidth}px`)
+  }
+  else {
+    video.setAttribute('height', '640px');
+    video.setAttribute('width', `${640 * vWeight / vHidth}px`)
+    canvas.setAttribute('height', '640px');
+    canvas.setAttribute('width', `${640 * vWeight / vHidth}px`)
+  }
+  applyFilter("mercury.png")
   gl = createContext(canvas, render)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   shader = createShader(gl,
     VertexShader, FragmentShader
   )
+
+
   createLoop(() => {
     tex = createTex2d(gl, video)
   }).start();
@@ -67,12 +82,13 @@ function uploadFilter(e) {
   const reader = new FileReader();
   reader.onload = () => {
     const url = reader.result;
-    const tLookup = new THREE.TextureLoader().load(url);
-    tLookup.generateMipmaps = false;
-    tLookup.minFilter = THREE.LinearFilter;
-    lut.uniforms.tLookup.value = tLookup;
+    applyFilter(url)
   }
   reader.readAsDataURL(file)
+}
+
+function applyFilter(url) {
+  lookupTexture = getTex2D(url);
 }
 
 function render() {
