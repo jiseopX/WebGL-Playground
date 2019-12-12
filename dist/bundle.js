@@ -9925,7 +9925,7 @@ var videos = [];
 videos.push(document.getElementById("video-0"))
 var canvases = []
 canvases.push(document.getElementById("canvas-0"))
-var lookupTexture;
+var lookupTextures = [];
 var videoTextures = [];
 var shaders = [];
 var gls = [];
@@ -9933,11 +9933,9 @@ videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
 
 
 function onVideoLoaded(index) {
-  console.log(videos[index])
   const videoStyle = window.getComputedStyle(videos[index])
   const vWidth = parseInt(videoStyle.width, 10);
   const vHeight = parseInt(videoStyle.height, 10)
-  console.log(`${vWidth} X ${vHeight}`)
   if (vWidth > vHeight) {
     videos[index].setAttribute('width', '640px');
     videos[index].setAttribute('height', `${640 * vHeight / vWidth}px`)
@@ -9946,11 +9944,10 @@ function onVideoLoaded(index) {
   }
   else {
     videos[index].setAttribute('height', '640px');
-    videos[index].setAttribute('width', `${640 * vWeight / vHidth}px`)
+    videos[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
     canvases[index].setAttribute('height', '640px');
-    canvases[index].setAttribute('width', `${640 * vWeight / vHidth}px`)
+    canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
-  console.log(canvases[index])
   applyFilter(index)
   createLoop(() => {
     const videoTexture = gl_texture2d__WEBPACK_IMPORTED_MODULE_4___default()(gls[index], videos[index])
@@ -9963,8 +9960,7 @@ function onVideoLoaded(index) {
     _lut_vert__WEBPACK_IMPORTED_MODULE_1__["default"], _lut_frag__WEBPACK_IMPORTED_MODULE_0__["default"]
   )
   shaders.push(shader);
-
-
+  console.log('shader\n', shader)
 
 
   if (index === 0) {
@@ -10028,15 +10024,15 @@ function uploadFilter(e) {
 }
 
 function applyFilter(index) {
-  lookupTexture = getTex2D(index);
+  lookupTextures[index] = getTex2D(index);
 }
 
 function render(index) {
-  if (!lookupTexture.texture)
+  if (!lookupTextures[index].texture)
     return;
   shaders[index].bind()
-  shaders[index].uniforms.uTexture = videoTextures[index].bind(0)
-  shaders[index].uniforms.uLookup = lookupTexture.texture.bind(1);
+  shaders[index].uniforms.uLookup = lookupTextures[index].texture.bind(1);
+  shaders[index].uniforms.uTexture = videoTextures[index].bind(0);
   a_big_triangle__WEBPACK_IMPORTED_MODULE_2___default()(gls[index])
 }
 
