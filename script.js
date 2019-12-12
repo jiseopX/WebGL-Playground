@@ -38,12 +38,17 @@ function onVideoLoaded(index) {
   }
   else {
     videos[index].setAttribute('height', '640px');
-    videos[index].setAttribute('width', `${640 * vWeight / vHidth}px`)
+    videos[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
     canvases[index].setAttribute('height', '640px');
-    canvases[index].setAttribute('width', `${640 * vWeight / vHidth}px`)
+    canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
-  console.log(`ah`)
+  console.log(canvases[index])
   applyFilter(index)
+  createLoop(() => {
+    const videoTexture = createTex2d(gls[index], videos[index])
+    videoTextures[index] ? (videoTextures[index] = videoTexture) :
+      videoTextures.push(videoTexture)
+  }).start();
   const gl = createContext(canvases[index], () => render(index))
   gls.push(gl)
   const shader = createShader(gls[index],
@@ -52,11 +57,7 @@ function onVideoLoaded(index) {
   shaders.push(shader);
 
 
-  createLoop(() => {
-    const videoTexture = createTex2d(gls[index], videos[index])
-    videoTextures[index] ? (videoTextures[index] = videoTexture) :
-      videoTextures.push(videoTexture)
-  }).start();
+
 
   if (index === 0) {
     initButtons();

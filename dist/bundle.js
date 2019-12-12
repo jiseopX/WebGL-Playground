@@ -9950,8 +9950,13 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('height', '640px');
     canvases[index].setAttribute('width', `${640 * vWeight / vHidth}px`)
   }
-  console.log(`ah`)
+  console.log(canvases[index])
   applyFilter(index)
+  createLoop(() => {
+    const videoTexture = gl_texture2d__WEBPACK_IMPORTED_MODULE_4___default()(gls[index], videos[index])
+    videoTextures[index] ? (videoTextures[index] = videoTexture) :
+      videoTextures.push(videoTexture)
+  }).start();
   const gl = gl_context__WEBPACK_IMPORTED_MODULE_3___default()(canvases[index], () => render(index))
   gls.push(gl)
   const shader = gl_shader__WEBPACK_IMPORTED_MODULE_5___default()(gls[index],
@@ -9960,11 +9965,7 @@ function onVideoLoaded(index) {
   shaders.push(shader);
 
 
-  createLoop(() => {
-    const videoTexture = gl_texture2d__WEBPACK_IMPORTED_MODULE_4___default()(gls[index], videos[index])
-    videoTextures[index] ? (videoTextures[index] = videoTexture) :
-      videoTextures.push(videoTexture)
-  }).start();
+
 
   if (index === 0) {
     initButtons();
