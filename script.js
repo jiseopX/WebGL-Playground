@@ -18,7 +18,6 @@ videos.push(document.getElementById("video-0"))
 var canvases = []
 canvases.push(document.getElementById("canvas-0"))
 var lookupTextures = [];
-var videoTextures = [];
 var shaders = [];
 var gls = [];
 
@@ -41,22 +40,17 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('height', '640px');
     canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
+  const gl = canvases[index].getContext('webgl2');
+  const videoTexture= initTexture(gl);
   applyFilter(index)
 
   const rafCallback=() => {
     stats.begin();
-    const videoTexture = createTex2d(gls[index], videos[index])
-    if (gls[index]) {
-      videoTexture.minFilter = gls[index].LINEAR
-      videoTexture.magFilter = gls[index].LINEAR
-    }
-    videoTextures[index] ? (videoTextures[index] = videoTexture) :
-      videoTextures.push(videoTexture)
-    render(index)
+    updateTexture(gl,videoTexture,videos[index])
+    render(index,videoTexture)
     stats.end();
     requestAnimationFrame(rafCallback)
   }
-  const gl = canvases[index].getContext('webgl2');
   gls.push(gl)
   const shader = createShader(gls[index],
     VertexShader, FragmentShader
@@ -129,12 +123,12 @@ function applyFilter(index) {
   lookupTextures[index] = getTex2D(index);
 }
 
-function render(index) {
+function render(index,videoTexture) {
   if (!lookupTextures[index].texture)
     return;
   shaders[index].bind()
   shaders[index].uniforms.uLookup = lookupTextures[index].texture.bind(1);
-  shaders[index].uniforms.uTexture = videoTextures[index].bind(0);
+  shaders[index].uniforms.uTexture = videoTexture;
   Triangle(gls[index])
 }
 
@@ -149,4 +143,42 @@ function getTex2D(index) {
   };
   obj.image.src = filterUrl
   return obj;
+}
+
+function initTexture(gl) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Because video has to be download over the internet
+  // they might take a moment until it's ready so
+  // put a single pixel in the texture so we can
+  // use it immediately.
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                width, height, border, srcFormat, srcType,
+                pixel);
+
+  // Turn off mips and set  wrapping to clamp to edge so it
+  // will work regardless of the dimensions of the video.
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  return texture;
+}
+
+function updateTexture(gl, texture, video) {
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+                srcFormat, srcType, video);
 }
