@@ -1544,13 +1544,6 @@ gl-constants@^1.0.0:
   resolved "https://registry.yarnpkg.com/gl-constants/-/gl-constants-1.0.0.tgz#597a504e364750ff50253aa35f8dea7af4a5d233"
   integrity sha1-WXpQTjZHUP9QJTqjX43qevSl0jM=
 
-gl-context@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/gl-context/-/gl-context-0.1.1.tgz#1134ff513223f3f6b3e2168cc88bcdc8b74e05f3"
-  integrity sha1-ETT/UTIj8/az4haMyIvNyLdOBfM=
-  dependencies:
-    raf-component "^1.1.2"
-
 gl-format-compiler-error@^1.0.2:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/gl-format-compiler-error/-/gl-format-compiler-error-1.0.3.tgz#0c79b1751899ce9732e86240f090aa41e98471a8"
@@ -3000,11 +2993,6 @@ querystring@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/querystring/-/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
   integrity sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
-
-raf-component@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/raf-component/-/raf-component-1.1.2.tgz#06fcdd026e4dea8532c1b64390defaa04950664d"
-  integrity sha1-BvzdAm5N6oUywbZDkN76oElQZk0=
 
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
   version "2.1.0"

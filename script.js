@@ -2,7 +2,6 @@
 import FragmentShader from './lut.frag';
 import VertexShader from './lut.vert';
 import Triangle from 'a-big-triangle'
-import createContext from 'gl-context'
 import createTex2d from 'gl-texture2d'
 import createShader from 'gl-shader'
 import Stats from 'stats.js'
@@ -53,13 +52,13 @@ function onVideoLoaded(index) {
     }
     videoTextures[index] ? (videoTextures[index] = videoTexture) :
       videoTextures.push(videoTexture)
+    render(index)
     stats.end();
     requestAnimationFrame(rafCallback)
   }
 
   requestAnimationFrame(rafCallback)
-
-  const gl = createContext(canvases[index], () => render(index))
+  const gl = canvases[index].getContext('webgl');
   gls.push(gl)
   const shader = createShader(gls[index],
     VertexShader, FragmentShader
