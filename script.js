@@ -8,7 +8,6 @@ import createShader from 'gl-shader'
 import Stats from 'stats.js'
 
 var stats = new Stats();
-const createLoop = require("raf-loop");
 
 const playButton = document.getElementById("play");
 const stopButton = document.getElementById("pause");
@@ -45,7 +44,7 @@ function onVideoLoaded(index) {
   }
   applyFilter(index)
 
-  createLoop(() => {
+  const rafCallback=() => {
     stats.begin();
     const videoTexture = createTex2d(gls[index], videos[index])
     if (gls[index]) {
@@ -55,7 +54,11 @@ function onVideoLoaded(index) {
     videoTextures[index] ? (videoTextures[index] = videoTexture) :
       videoTextures.push(videoTexture)
     stats.end();
-  }).start();
+    requestAnimationFrame(rafCallback)
+  }
+
+  requestAnimationFrame(rafCallback)
+
   const gl = createContext(canvases[index], () => render(index))
   gls.push(gl)
   const shader = createShader(gls[index],
