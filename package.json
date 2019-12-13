@@ -3,7 +3,6 @@
     "@pixi/filter-color-map": "^3.0.3",
     "a-big-triangle": "^1.0.3",
     "electron-to-chromium": "^1.3.280",
-    "font-manager": "^0.3.0",
     "gl-context": "^0.1.1",
     "gl-shader": "^4.2.1",
     "gl-texture2d": "^2.1.0",
