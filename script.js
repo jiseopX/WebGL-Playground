@@ -56,13 +56,12 @@ function onVideoLoaded(index) {
     stats.end();
     requestAnimationFrame(rafCallback)
   }
-
-  requestAnimationFrame(rafCallback)
-  const gl = canvases[index].getContext('webgl');
+  const gl = canvases[index].getContext('webgl2');
   gls.push(gl)
   const shader = createShader(gls[index],
     VertexShader, FragmentShader
   )
+  requestAnimationFrame(rafCallback)
   shaders.push(shader);
 
   if (index === 0) {
