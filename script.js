@@ -5,7 +5,9 @@ import Triangle from 'a-big-triangle'
 import createContext from 'gl-context'
 import createTex2d from 'gl-texture2d'
 import createShader from 'gl-shader'
+import Stats from 'stats.js'
 
+var stats = new Stats();
 const createLoop = require("raf-loop");
 
 const playButton = document.getElementById("play");
@@ -21,9 +23,8 @@ var lookupTextures = [];
 var videoTextures = [];
 var shaders = [];
 var gls = [];
-var fpsCounter = {
-  timer: Date.now(), count: 0,
-}
+
+document.body.appendChild(stats.dom)
 videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
 
 function onVideoLoaded(index) {
@@ -45,14 +46,7 @@ function onVideoLoaded(index) {
   applyFilter(index)
 
   createLoop(() => {
-    const now = Date.now()
-    if (now - fpsCounter.timer > 1000) {
-      fpsCounter.timer = now;
-      console.log(`${fpsCounter.count} fps`);
-      fpsCounter.count = 1;
-    } else {
-      fpsCounter.count++
-    }
+    stats.begin();
     const videoTexture = createTex2d(gls[index], videos[index])
     if (gls[index]) {
       videoTexture.minFilter = gls[index].LINEAR
@@ -60,6 +54,7 @@ function onVideoLoaded(index) {
     }
     videoTextures[index] ? (videoTextures[index] = videoTexture) :
       videoTextures.push(videoTexture)
+    stats.end();
   }).start();
   const gl = createContext(canvases[index], () => render(index))
   gls.push(gl)
