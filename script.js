@@ -21,8 +21,10 @@ var lookupTextures = [];
 var videoTextures = [];
 var shaders = [];
 var gls = [];
+var fpsCounter = {
+  timer: Date.now(), count: 0,
+}
 videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
-
 
 function onVideoLoaded(index) {
   const videoStyle = window.getComputedStyle(videos[index])
@@ -43,6 +45,14 @@ function onVideoLoaded(index) {
   applyFilter(index)
 
   createLoop(() => {
+    const now = Date.now()
+    if (now - fpsCounter.timer > 1000) {
+      fpsCounter.timer = now;
+      console.log(`${fpsCounter.count} fps`);
+      fpsCounter.count = 1;
+    } else {
+      fpsCounter.count++
+    }
     const videoTexture = createTex2d(gls[index], videos[index])
     if (gls[index]) {
       videoTexture.minFilter = gls[index].LINEAR

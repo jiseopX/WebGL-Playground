@@ -20,7 +20,7 @@
     "webpack": "^4.41.0"
   },
   "scripts": {
-    "start": "webpack --devtool source-map ./script.js --config webpack.config.js && node --inspect server.js"
+    "start": "webpack --devtool source-map ./script.js --config webpack.config.js && node server.js"
   },
   "devDependencies": {
     "eslint": "^6.4.0",
