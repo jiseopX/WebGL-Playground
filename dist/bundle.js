@@ -95,7 +95,7 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("precision mediump float;\n#define GLSLIFY 1\n\nuniform sampler2D uTexture;\nuniform sampler2D uLookup;\nuniform float stop;\nvarying vec2 vUv;\n\nvec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {\n    #ifndef LUT_NO_CLAMP\n        textureColor = clamp(textureColor, 0.0, 1.0);\n    #endif\n\n    mediump float blueColor = textureColor.b * 63.0;\n\n    mediump vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    mediump vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    highp vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos1.y = 1.0-texPos1.y;\n    #endif\n\n    highp vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos2.y = 1.0-texPos2.y;\n    #endif\n\n    lowp vec4 newColor1 = texture2D(lookupTable, texPos1);\n    lowp vec4 newColor2 = texture2D(lookupTable, texPos2);\n\n    lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor;\n}\n\nvoid main() {\n\tvec4 color = texture2D(uTexture, vUv);\n\n\tif (vUv.x > stop)\n\t\tgl_FragColor = lookup(color, uLookup);\n\telse \n\t\tgl_FragColor = color;\n}");
+/* harmony default export */ __webpack_exports__["default"] = ("precision mediump float;\n#define GLSLIFY 1\n\nuniform sampler2D uTexture;\nuniform sampler2D uLookup;\nuniform float filterAlpha;\nuniform float stop;\nvarying vec2 vUv;\n\nvec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {\n    #ifndef LUT_NO_CLAMP\n        textureColor = clamp(textureColor, 0.0, 1.0);\n    #endif\n\n    mediump float blueColor = textureColor.b * 63.0;\n\n    mediump vec2 quad1;\n    quad1.y = floor(floor(blueColor) / 8.0);\n    quad1.x = floor(blueColor) - (quad1.y * 8.0);\n\n    mediump vec2 quad2;\n    quad2.y = floor(ceil(blueColor) / 8.0);\n    quad2.x = ceil(blueColor) - (quad2.y * 8.0);\n\n    highp vec2 texPos1;\n    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos1.y = 1.0-texPos1.y;\n    #endif\n\n    highp vec2 texPos2;\n    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n\n    #ifdef LUT_FLIP_Y\n        texPos2.y = 1.0-texPos2.y;\n    #endif\n\n    lowp vec4 newColor1 = texture2D(lookupTable, texPos1);\n    lowp vec4 newColor2 = texture2D(lookupTable, texPos2);\n\n    lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));\n    return newColor* filterAlpha + textureColor*(1.0-filterAlpha);\n}\n\nvoid main() {\n\tvec4 color = texture2D(uTexture, vUv);\n\n\tif (vUv.x > stop)\n\t\tgl_FragColor = lookup(color, uLookup);\n\telse \n\t\tgl_FragColor = color;\n}");
 
 /***/ }),
 
@@ -3588,34 +3588,34 @@ function formatCompilerError(errLog, src, type) {
 "use strict";
 
 
-var createUniformWrapper   = __webpack_require__(/*! ./lib/create-uniforms */ "./node_modules/gl-shader/lib/create-uniforms.js")
+var createUniformWrapper = __webpack_require__(/*! ./lib/create-uniforms */ "./node_modules/gl-shader/lib/create-uniforms.js")
 var createAttributeWrapper = __webpack_require__(/*! ./lib/create-attributes */ "./node_modules/gl-shader/lib/create-attributes.js")
-var makeReflect            = __webpack_require__(/*! ./lib/reflect */ "./node_modules/gl-shader/lib/reflect.js")
-var shaderCache            = __webpack_require__(/*! ./lib/shader-cache */ "./node_modules/gl-shader/lib/shader-cache.js")
-var runtime                = __webpack_require__(/*! ./lib/runtime-reflect */ "./node_modules/gl-shader/lib/runtime-reflect.js")
-var GLError                = __webpack_require__(/*! ./lib/GLError */ "./node_modules/gl-shader/lib/GLError.js")
+var makeReflect = __webpack_require__(/*! ./lib/reflect */ "./node_modules/gl-shader/lib/reflect.js")
+var shaderCache = __webpack_require__(/*! ./lib/shader-cache */ "./node_modules/gl-shader/lib/shader-cache.js")
+var runtime = __webpack_require__(/*! ./lib/runtime-reflect */ "./node_modules/gl-shader/lib/runtime-reflect.js")
+var GLError = __webpack_require__(/*! ./lib/GLError */ "./node_modules/gl-shader/lib/GLError.js")
 
 //Shader object
 function Shader(gl) {
-  this.gl         = gl
+  this.gl = gl
   this.gl.lastAttribCount = 0  // fixme where else should we store info, safe but not nice on the gl object
 
   //Default initialize these to null
-  this._vref      =
-  this._fref      =
-  this._relink    =
-  this.vertShader =
-  this.fragShader =
-  this.program    =
-  this.attributes =
-  this.uniforms   =
-  this.types      = null
+  this._vref =
+    this._fref =
+    this._relink =
+    this.vertShader =
+    this.fragShader =
+    this.program =
+    this.attributes =
+    this.uniforms =
+    this.types = null
 }
 
 var proto = Shader.prototype
 
-proto.bind = function() {
-  if(!this.program) {
+proto.bind = function () {
+  if (!this.program) {
     this._relink()
   }
 
@@ -3624,12 +3624,12 @@ proto.bind = function() {
   var newAttribCount = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_ATTRIBUTES) // more robust approach
   //var newAttribCount = Object.keys(this.attributes).length // avoids the probably immaterial introspection slowdown
   var oldAttribCount = this.gl.lastAttribCount
-  if(newAttribCount > oldAttribCount) {
-    for(i = oldAttribCount; i < newAttribCount; i++) {
+  if (newAttribCount > oldAttribCount) {
+    for (i = oldAttribCount; i < newAttribCount; i++) {
       this.gl.enableVertexAttribArray(i)
     }
-  } else if(oldAttribCount > newAttribCount) {
-    for(i = newAttribCount; i < oldAttribCount; i++) {
+  } else if (oldAttribCount > newAttribCount) {
+    for (i = newAttribCount; i < oldAttribCount; i++) {
       this.gl.disableVertexAttribArray(i)
     }
   }
@@ -3639,7 +3639,7 @@ proto.bind = function() {
   this.gl.useProgram(this.program)
 }
 
-proto.dispose = function() {
+proto.dispose = function () {
 
   // disabling vertex attributes so new shader starts with zero
   // and it's also useful if all shaders are disposed but the
@@ -3650,77 +3650,77 @@ proto.dispose = function() {
   }
   this.gl.lastAttribCount = 0
 
-  if(this._fref) {
+  if (this._fref) {
     this._fref.dispose()
   }
-  if(this._vref) {
+  if (this._vref) {
     this._vref.dispose()
   }
   this.attributes =
-  this.types      =
-  this.vertShader =
-  this.fragShader =
-  this.program    =
-  this._relink    =
-  this._fref      =
-  this._vref      = null
+    this.types =
+    this.vertShader =
+    this.fragShader =
+    this.program =
+    this._relink =
+    this._fref =
+    this._vref = null
 }
 
 function compareAttributes(a, b) {
-  if(a.name < b.name) {
+  if (a.name < b.name) {
     return -1
   }
   return 1
 }
 
 //Update export hook for glslify-live
-proto.update = function(
-    vertSource
+proto.update = function (
+  vertSource
   , fragSource
   , uniforms
   , attributes) {
 
   //If only one object passed, assume glslify style output
-  if(!fragSource || arguments.length === 1) {
+  if (!fragSource || arguments.length === 1) {
     var obj = vertSource
     vertSource = obj.vertex
     fragSource = obj.fragment
-    uniforms   = obj.uniforms
+    uniforms = obj.uniforms
     attributes = obj.attributes
   }
 
   var wrapper = this
-  var gl      = wrapper.gl
+  var gl = wrapper.gl
 
   //Compile vertex and fragment shaders
   var pvref = wrapper._vref
   wrapper._vref = shaderCache.shader(gl, gl.VERTEX_SHADER, vertSource)
-  if(pvref) {
+  if (pvref) {
     pvref.dispose()
   }
   wrapper.vertShader = wrapper._vref.shader
   var pfref = this._fref
   wrapper._fref = shaderCache.shader(gl, gl.FRAGMENT_SHADER, fragSource)
-  if(pfref) {
+  if (pfref) {
     pfref.dispose()
   }
   wrapper.fragShader = wrapper._fref.shader
 
   //If uniforms/attributes is not specified, use RT reflection
-  if(!uniforms || !attributes) {
+  if (!uniforms || !attributes) {
 
     //Create initial test program
     var testProgram = gl.createProgram()
     gl.attachShader(testProgram, wrapper.fragShader)
     gl.attachShader(testProgram, wrapper.vertShader)
     gl.linkProgram(testProgram)
-    if(!gl.getProgramParameter(testProgram, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(testProgram, gl.LINK_STATUS)) {
       var errLog = gl.getProgramInfoLog(testProgram)
       throw new GLError(errLog, 'Error linking program:' + errLog)
     }
 
     //Load data from runtime
-    uniforms   = uniforms   || runtime.uniforms(gl, testProgram)
+    uniforms = uniforms || runtime.uniforms(gl, testProgram)
     attributes = attributes || runtime.attributes(gl, testProgram)
 
     //Release test program
@@ -3733,24 +3733,24 @@ proto.update = function(
   attributes.sort(compareAttributes)
 
   //Convert attribute types, read out locations
-  var attributeUnpacked  = []
-  var attributeNames     = []
+  var attributeUnpacked = []
+  var attributeNames = []
   var attributeLocations = []
   var i
-  for(i=0; i<attributes.length; ++i) {
+  for (i = 0; i < attributes.length; ++i) {
     var attr = attributes[i]
-    if(attr.type.indexOf('mat') >= 0) {
-      var size = attr.type.charAt(attr.type.length-1)|0
+    if (attr.type.indexOf('mat') >= 0) {
+      var size = attr.type.charAt(attr.type.length - 1) | 0
       var locVector = new Array(size)
-      for(var j=0; j<size; ++j) {
+      for (var j = 0; j < size; ++j) {
         locVector[j] = attributeLocations.length
         attributeNames.push(attr.name + '[' + j + ']')
-        if(typeof attr.location === 'number') {
+        if (typeof attr.location === 'number') {
           attributeLocations.push(attr.location + j)
-        } else if(Array.isArray(attr.location) &&
-                  attr.location.length === size &&
-                  typeof attr.location[j] === 'number') {
-          attributeLocations.push(attr.location[j]|0)
+        } else if (Array.isArray(attr.location) &&
+          attr.location.length === size &&
+          typeof attr.location[j] === 'number') {
+          attributeLocations.push(attr.location[j] | 0)
         } else {
           attributeLocations.push(-1)
         }
@@ -3764,11 +3764,11 @@ proto.update = function(
       attributeUnpacked.push({
         name: attr.name,
         type: attr.type,
-        locations: [ attributeLocations.length ]
+        locations: [attributeLocations.length]
       })
       attributeNames.push(attr.name)
-      if(typeof attr.location === 'number') {
-        attributeLocations.push(attr.location|0)
+      if (typeof attr.location === 'number') {
+        attributeLocations.push(attr.location | 0)
       } else {
         attributeLocations.push(-1)
       }
@@ -3777,9 +3777,9 @@ proto.update = function(
 
   //For all unspecified attributes, assign them lexicographically min attribute
   var curLocation = 0
-  for(i=0; i<attributeLocations.length; ++i) {
-    if(attributeLocations[i] < 0) {
-      while(attributeLocations.indexOf(curLocation) >= 0) {
+  for (i = 0; i < attributeLocations.length; ++i) {
+    if (attributeLocations[i] < 0) {
+      while (attributeLocations.indexOf(curLocation) >= 0) {
         curLocation += 1
       }
       attributeLocations[i] = curLocation
@@ -3790,15 +3790,15 @@ proto.update = function(
   var uniformLocations = new Array(uniforms.length)
   function relink() {
     wrapper.program = shaderCache.program(
-        gl
+      gl
       , wrapper._vref
       , wrapper._fref
       , attributeNames
       , attributeLocations)
 
-    for(var i=0; i<uniforms.length; ++i) {
+    for (var i = 0; i < uniforms.length; ++i) {
       uniformLocations[i] = gl.getUniformLocation(
-          wrapper.program
+        wrapper.program
         , uniforms[i].name)
     }
   }
@@ -3811,20 +3811,20 @@ proto.update = function(
 
   //Generate type info
   wrapper.types = {
-    uniforms:   makeReflect(uniforms),
+    uniforms: makeReflect(uniforms),
     attributes: makeReflect(attributes)
   }
 
   //Generate attribute wrappers
   wrapper.attributes = createAttributeWrapper(
-      gl
+    gl
     , wrapper
     , attributeUnpacked
     , attributeLocations)
 
   //Generate uniform wrappers
   Object.defineProperty(wrapper, 'uniforms', createUniformWrapper(
-      gl
+    gl
     , wrapper
     , uniforms
     , uniformLocations))
@@ -3832,7 +3832,7 @@ proto.update = function(
 
 //Compiles and links a shader program with the given attribute and vertex list
 function createShader(
-    gl
+  gl
   , vertSource
   , fragSource
   , uniforms
@@ -3841,7 +3841,7 @@ function createShader(
   var shader = new Shader(gl)
 
   shader.update(
-      vertSource
+    vertSource
     , fragSource
     , uniforms
     , attributes)
@@ -8952,6 +8952,7 @@ canvases.push(document.getElementById("canvas-0"))
 var lookupTexture;
 var shaders = [];
 var gls = [];
+var filterAlpha = 70
 
 document.body.appendChild(stats.dom)
 videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
@@ -9010,6 +9011,15 @@ function initButtons() {
   };
   uploadFilterButton.onchange = uploadFilter;
   uploadVideoButton.onchange = uploadVideo;
+  var slider = document.getElementById("filter-alpha");
+  var output = document.getElementById("alpha-meter");
+  output.innerHTML = slider.value; // Display the default slider value
+
+  // Update the current slider value (each time you drag the slider handle)
+  slider.oninput = function () {
+    filterAlpha = this.value
+    output.innerHTML = filterAlpha
+  }
 }
 
 function uploadVideo(e) {
@@ -9059,6 +9069,7 @@ function render(index, videoTexture) {
   shaders[index].bind()
   shaders[index].uniforms.uLookup = lookupTexture
   shaders[index].uniforms.uTexture = videoTexture;
+  shaders[index].uniforms.filterAlpha = filterAlpha / 100
   a_big_triangle__WEBPACK_IMPORTED_MODULE_2___default()(gls[index])
 }
 
@@ -9113,6 +9124,7 @@ function updateTexture(gl, texture, video) {
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
     srcFormat, srcType, video);
 }
+
 
 /***/ })
 

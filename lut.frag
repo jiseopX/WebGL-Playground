@@ -3,6 +3,7 @@ precision mediump float;
 
 uniform sampler2D uTexture;
 uniform sampler2D uLookup;
+uniform float filterAlpha;
 uniform float stop;
 varying vec2 vUv;
 
@@ -41,7 +42,7 @@ vec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {
     lowp vec4 newColor2 = texture2D(lookupTable, texPos2);
 
     lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
-    return newColor;
+    return newColor* filterAlpha + textureColor*(1.0-filterAlpha);
 }
 
 void main() {

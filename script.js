@@ -20,6 +20,7 @@ canvases.push(document.getElementById("canvas-0"))
 var lookupTexture;
 var shaders = [];
 var gls = [];
+var filterAlpha = 70
 
 document.body.appendChild(stats.dom)
 videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
@@ -78,6 +79,15 @@ function initButtons() {
   };
   uploadFilterButton.onchange = uploadFilter;
   uploadVideoButton.onchange = uploadVideo;
+  var slider = document.getElementById("filter-alpha");
+  var output = document.getElementById("alpha-meter");
+  output.innerHTML = slider.value; // Display the default slider value
+
+  // Update the current slider value (each time you drag the slider handle)
+  slider.oninput = function () {
+    filterAlpha = this.value
+    output.innerHTML = filterAlpha
+  }
 }
 
 function uploadVideo(e) {
@@ -127,6 +137,7 @@ function render(index, videoTexture) {
   shaders[index].bind()
   shaders[index].uniforms.uLookup = lookupTexture
   shaders[index].uniforms.uTexture = videoTexture;
+  shaders[index].uniforms.filterAlpha = filterAlpha / 100
   Triangle(gls[index])
 }
 
