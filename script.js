@@ -120,7 +120,7 @@ function uploadFilter(e) {
 }
 
 function applyFilter(index) {
-  lookupTextures[index] = getTex2D(index);
+  lookupTextures[index] = getFilter(index);
 }
 
 function render(index,videoTexture) {
@@ -132,7 +132,7 @@ function render(index,videoTexture) {
   Triangle(gls[index])
 }
 
-function getTex2D(index) {
+function getFilter(index) {
   var obj = {
     image: new Image(),
     texture: null
