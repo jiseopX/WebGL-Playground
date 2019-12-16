@@ -17,7 +17,7 @@ var videos = [];
 videos.push(document.getElementById("video-0"))
 var canvases = []
 canvases.push(document.getElementById("canvas-0"))
-var lookupTextures = [];
+var lookupTexture;
 var shaders = [];
 var gls = [];
 
@@ -41,22 +41,23 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
   const gl = canvases[index].getContext('webgl2');
-  const videoTexture= initTexture(gl);
-  applyFilter(index)
-
-  const rafCallback=() => {
-    stats.begin();
-    updateTexture(gl,videoTexture,videos[index])
-    render(index,videoTexture)
-    stats.end();
-    requestAnimationFrame(rafCallback)
-  }
   gls.push(gl)
-  const shader = createShader(gls[index],
-    VertexShader, FragmentShader
-  )
-  requestAnimationFrame(rafCallback)
-  shaders.push(shader);
+  const videoTexture = initTexture(gl);
+  getFilter(index).then(function () {
+    console.log('got filter\n', lookupTexture)
+    const rafCallback = () => {
+      stats.begin();
+      updateTexture(gl, videoTexture, videos[index])
+      render(index, videoTexture)
+      stats.end();
+      requestAnimationFrame(rafCallback)
+    }
+    const shader = createShader(gls[index],
+      VertexShader, FragmentShader
+    )
+    requestAnimationFrame(rafCallback)
+    shaders.push(shader);
+  })
 
   if (index === 0) {
     initButtons();
@@ -114,35 +115,32 @@ function uploadFilter(e) {
   const reader = new FileReader();
   reader.onload = () => {
     filterUrl = reader.result;
-    videos.forEach((video, index) => applyFilter(index))
+    videos.forEach((video, index) => getFilter(index))
   }
   reader.readAsDataURL(file)
 }
 
-function applyFilter(index) {
-  lookupTextures[index] = getFilter(index);
-}
 
-function render(index,videoTexture) {
-  if (!lookupTextures[index].texture)
+function render(index, videoTexture) {
+  if (!lookupTexture)
     return;
   shaders[index].bind()
-  shaders[index].uniforms.uLookup = lookupTextures[index].texture.bind(1);
+  shaders[index].uniforms.uLookup = lookupTexture
   shaders[index].uniforms.uTexture = videoTexture;
   Triangle(gls[index])
 }
 
 function getFilter(index) {
-  var obj = {
-    image: new Image(),
-    texture: null
-  };
-  obj.image.onload = () => {
-    obj.texture = createTex2d(gls[index], obj.image)
-    obj.texture.minFilter = obj.texture.magFilter = gls[index].LINEAR;
-  };
-  obj.image.src = filterUrl
-  return obj;
+  return new Promise(resolve => {
+    var image = new Image()
+    image.src = filterUrl
+    image.onload = () => {
+      const texture = createTex2d(gls[index], image)
+      texture.minFilter = texture.magFilter = gls[index].LINEAR;
+      lookupTexture = texture.bind(1)
+      resolve()
+    }
+  })
 }
 
 function initTexture(gl) {
@@ -162,8 +160,8 @@ function initTexture(gl) {
   const srcType = gl.UNSIGNED_BYTE;
   const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                width, height, border, srcFormat, srcType,
-                pixel);
+    width, height, border, srcFormat, srcType,
+    pixel);
 
   // Turn off mips and set  wrapping to clamp to edge so it
   // will work regardless of the dimensions of the video.
@@ -178,7 +176,8 @@ function updateTexture(gl, texture, video) {
   const internalFormat = gl.RGBA;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
+  gl.activeTexture(gl.TEXTURE0)
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                srcFormat, srcType, video);
+    srcFormat, srcType, video);
 }
