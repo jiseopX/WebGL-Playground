@@ -10,14 +10,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /(node_modules)/,
-        enforce: "post",
-        use: {
-          loader: "ify-loader"
-        }
-      },
-      {
         test: /\.(glsl|frag|vert)$/,
         exclude: /(node_modules)/,
         use: {
