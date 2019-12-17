@@ -45,7 +45,6 @@ function onVideoLoaded(index) {
   gls.push(gl)
   const videoTexture = initTexture(gl);
   getFilter(index).then(function () {
-    console.log('got filter\n', lookupTexture)
     const rafCallback = () => {
       stats.begin();
       updateTexture(gl, videoTexture, videos[index])
@@ -81,12 +80,11 @@ function initButtons() {
   uploadVideoButton.onchange = uploadVideo;
   var slider = document.getElementById("filter-alpha");
   var output = document.getElementById("alpha-meter");
-  output.innerHTML = slider.value; // Display the default slider value
+  output.innerHTML = slider.value;
 
-  // Update the current slider value (each time you drag the slider handle)
   slider.oninput = function () {
     filterAlpha = this.value
-    output.innerHTML = filterAlpha
+    output.innerHTML = `alpha : ${filterAlpha}`
   }
 }
 
@@ -94,8 +92,6 @@ function uploadVideo(e) {
   const file = e.target.files[0]
   const reader = new FileReader();
   reader.onload = () => {
-    const url = reader.result;
-    //video.src = url
     const newDiv = document.createElement('div');
     const newVideo = document.createElement('video');
     const newCanvas = document.createElement('canvas');
@@ -157,11 +153,6 @@ function getFilter(index) {
 function initTexture(gl) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
-
-  // Because video has to be download over the internet
-  // they might take a moment until it's ready so
-  // put a single pixel in the texture so we can
-  // use it immediately.
   const level = 0;
   const internalFormat = gl.RGBA;
   const width = 1;
@@ -169,13 +160,11 @@ function initTexture(gl) {
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+  const pixel = new Uint8Array([0, 0, 255, 255]);
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
     width, height, border, srcFormat, srcType,
     pixel);
 
-  // Turn off mips and set  wrapping to clamp to edge so it
-  // will work regardless of the dimensions of the video.
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
