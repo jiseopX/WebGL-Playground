@@ -25,21 +25,7 @@ document.body.appendChild(stats.dom)
 videos[0].addEventListener('loadeddata', () => onVideoLoaded(0), false);
 
 function onVideoLoaded(index) {
-  const videoStyle = window.getComputedStyle(videos[index])
-  const vWidth = parseInt(videoStyle.width, 10);
-  const vHeight = parseInt(videoStyle.height, 10)
-  if (vWidth > vHeight) {
-    videos[index].setAttribute('width', '640px');
-    videos[index].setAttribute('height', `${640 * vHeight / vWidth}px`)
-    canvases[index].setAttribute('width', `640px`)
-    canvases[index].setAttribute('height', `${640 * vHeight / vWidth}px`)
-  }
-  else {
-    videos[index].setAttribute('height', '640px');
-    videos[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
-    canvases[index].setAttribute('height', '640px');
-    canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
-  }
+  initSize(index)
   const gl = canvases[index].getContext('webgl');
   gls.push(gl)
   const videoTexture = initTexture(gl, 0);
@@ -64,6 +50,24 @@ function onVideoLoaded(index) {
     if (gls[0] === null) {
       alert('no init')
     }
+  }
+}
+
+function initSize(index) {
+  const videoStyle = window.getComputedStyle(videos[index])
+  const vWidth = parseInt(videoStyle.width, 10);
+  const vHeight = parseInt(videoStyle.height, 10)
+  if (vWidth > vHeight) {
+    videos[index].setAttribute('width', '640px');
+    videos[index].setAttribute('height', `${640 * vHeight / vWidth}px`)
+    canvases[index].setAttribute('width', `640px`)
+    canvases[index].setAttribute('height', `${640 * vHeight / vWidth}px`)
+  }
+  else {
+    videos[index].setAttribute('height', '640px');
+    videos[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
+    canvases[index].setAttribute('height', '640px');
+    canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
 }
 
@@ -146,7 +150,6 @@ function getFilter(index) {
       const gl = gls[index]
       const texture = initTexture(gl, 1)
       updateTexture(gl, image)
-      texture.minFilter = texture.magFilter = gl.LINEAR;
       lookupTexture = texture
       gl.activeTexture(gl.TEXTURE0)
       resolve()
