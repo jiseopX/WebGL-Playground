@@ -1,45 +1,38 @@
 <html>
-  <head>
-    <h1>WebGL tester</h1>
-    <link rel="stylesheet" type="text/css" href="style.css">
 
-  </head>
-  <body>
-    <input type="button" value="play" id="play" />
-    <input type="button" value="pause" id="pause" />
-    <div>
-      <p>upload filter</p>
-      <input
-        type="file"
-        value="upload filter"
-        id="upload-filter"
-        accept=".png"
-      />
-    </div>
-    <div>
-      <p>upload video</p>
-      <input
-        type="file"
-        value="upload video"
-        id="upload-video"
-        accept=".mov, .mp4, .avi"
-      />
-    </div>
-    <div class="slidecontainer">
-      <input type="range" min="0" max="100" value="70" class="slider" id="filter-alpha">
-      <p id="alpha-meter"></p>
-    </div>
-    <div style="flex-direction: row; display: flex;">
-      <div>
-        <h3>raw</h3>
-        <video crossorigin="anonymous" id="video-0" src="skyfall_4k.mp4"></video>
-      </div>
-      <div>
-        <h3>filtered</h3>
-        <canvas id="canvas-0"></canvas>
-      </div>
-    </div>
+<head>
+  <h1>WebGL tester</h1>
+  <link rel="stylesheet" type="text/css" href="style.css">
 
-    <script type="text/javascript" src="dist/bundle.js"></script>
-  </body>
+</head>
+
+<body>
+  <input type="button" value="play" id="play" />
+  <input type="button" value="pause" id="pause" />
+  <div>
+    <p>upload filter</p>
+    <input type="file" value="upload filter" id="upload-filter" accept=".png" />
+  </div>
+  <div>
+    <p>upload video</p>
+    <input type="file" value="upload video" id="upload-video" accept=".mov, .mp4, .avi" />
+  </div>
+  <div class="slidecontainer">
+    <input type="range" min="0" max="100" value="70" class="slider" id="filter-alpha">
+    <p id="alpha-meter"></p>
+  </div>
+  <div style="flex-direction: row; display: flex;">
+    <div>
+      <h3>raw</h3>
+      <video crossorigin="anonymous" id="video-0" src="skyfall_4k.mp4"></video>
+    </div>
+    <div>
+      <h3>filtered</h3>
+      <canvas id="canvas-0"></canvas>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="dist/bundle.js"></script>
+</body>
+
 </html>
