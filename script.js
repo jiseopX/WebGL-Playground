@@ -2,7 +2,6 @@
 import FragmentShader from './lut.frag';
 import VertexShader from './lut.vert';
 import Triangle from 'a-big-triangle'
-import createTex2d from 'gl-texture2d'
 import createShader from 'gl-shader'
 import Stats from 'stats.js'
 
@@ -43,11 +42,11 @@ function onVideoLoaded(index) {
   }
   const gl = canvases[index].getContext('webgl');
   gls.push(gl)
-  const videoTexture = initTexture(gl);
+  const videoTexture = initTexture(gl, 0);
   getFilter(index).then(function () {
+    bindTexture(gl, videoTexture, 0)
     const rafCallback = () => {
       stats.begin();
-      bindTexture(gl, videoTexture, 0)
       updateTexture(gl, videos[index])
       render(index, videoTexture)
       stats.end();
@@ -131,11 +130,12 @@ function uploadFilter(e) {
 function render(index, videoTexture) {
   if (!lookupTexture)
     return;
+  const gl = gls[index]
   shaders[index].bind()
-  shaders[index].uniforms.uLookup = lookupTexture
-  shaders[index].uniforms.uTexture = videoTexture;
+  shaders[index].uniforms.uLookup = 1
+  shaders[index].uniforms.uTexture = 0
   shaders[index].uniforms.filterAlpha = filterAlpha / 100
-  Triangle(gls[index])
+  Triangle(gl)
 }
 
 function getFilter(index) {
@@ -144,9 +144,10 @@ function getFilter(index) {
     image.src = filterUrl
     image.onload = () => {
       const gl = gls[index]
-      const texture = createTex2d(gl, image)
+      const texture = initTexture(gl, 1)
+      updateTexture(gl, image)
       texture.minFilter = texture.magFilter = gl.LINEAR;
-      lookupTexture = texture.bind(1)
+      lookupTexture = texture
       resolve()
     }
   })
@@ -155,9 +156,12 @@ function getFilter(index) {
 function initTexture(gl, unit) {
   const texture = gl.createTexture();
   bindTexture(gl, texture, unit)
+
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
   return texture;
 }
 
