@@ -41,13 +41,14 @@ function onVideoLoaded(index) {
     canvases[index].setAttribute('height', '640px');
     canvases[index].setAttribute('width', `${640 * vWidth / vHeight}px`)
   }
-  const gl = canvases[index].getContext('webgl2');
+  const gl = canvases[index].getContext('webgl');
   gls.push(gl)
   const videoTexture = initTexture(gl);
   getFilter(index).then(function () {
     const rafCallback = () => {
       stats.begin();
-      updateTexture(gl, videoTexture, videos[index])
+      bindTexture(gl, videoTexture, 0)
+      updateTexture(gl, videos[index])
       render(index, videoTexture)
       stats.end();
       requestAnimationFrame(rafCallback)
@@ -142,42 +143,35 @@ function getFilter(index) {
     var image = new Image()
     image.src = filterUrl
     image.onload = () => {
-      const texture = createTex2d(gls[index], image)
-      texture.minFilter = texture.magFilter = gls[index].LINEAR;
+      const gl = gls[index]
+      const texture = createTex2d(gl, image)
+      texture.minFilter = texture.magFilter = gl.LINEAR;
       lookupTexture = texture.bind(1)
       resolve()
     }
   })
 }
 
-function initTexture(gl) {
+function initTexture(gl, unit) {
   const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  const level = 0;
-  const internalFormat = gl.RGBA;
-  const width = 1;
-  const height = 1;
-  const border = 0;
-  const srcFormat = gl.RGBA;
-  const srcType = gl.UNSIGNED_BYTE;
-  const pixel = new Uint8Array([0, 0, 255, 255]);
-  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-    width, height, border, srcFormat, srcType,
-    pixel);
-
+  bindTexture(gl, texture, unit)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   return texture;
 }
 
-function updateTexture(gl, texture, video) {
+function updateTexture(gl, screen) {
   const level = 0;
   const internalFormat = gl.RGBA;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  gl.activeTexture(gl.TEXTURE0)
-  gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-    srcFormat, srcType, video);
+    srcFormat, srcType, screen);
+
+}
+
+function bindTexture(gl, texture, unit) {
+  gl.activeTexture(gl.TEXTURE0 + unit)
+  gl.bindTexture(gl.TEXTURE_2D, texture)
 }
