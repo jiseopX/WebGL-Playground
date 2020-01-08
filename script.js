@@ -54,16 +54,28 @@ function initSize(index) {
   const videoStyle = window.getComputedStyle(videos[index]);
   const vWidth = parseInt(videoStyle.width, 10);
   const vHeight = parseInt(videoStyle.height, 10);
+  const dpr = window.devicePixelRatio || 1;
+
   if (vWidth > vHeight) {
     videos[index].setAttribute("width", "640px");
     videos[index].setAttribute("height", `${(640 * vHeight) / vWidth}px`);
-    canvases[index].setAttribute("width", `640px`);
-    canvases[index].setAttribute("height", `${(640 * vHeight) / vWidth}px`);
+    canvases[index].setAttribute("width", `${640 * dpr}px`);
+    canvases[index].setAttribute(
+      "height",
+      `${(640 * dpr * vHeight) / vWidth}px`
+    );
+    canvases[index].style.width = `${640}px`;
+    canvases[index].style.height = `${(640 * vHeight) / vWidth}px`;
   } else {
     videos[index].setAttribute("height", "640px");
     videos[index].setAttribute("width", `${(640 * vWidth) / vHeight}px`);
-    canvases[index].setAttribute("height", "640px");
-    canvases[index].setAttribute("width", `${(640 * vWidth) / vHeight}px`);
+    canvases[index].setAttribute("height", `${640 * dpr}px`);
+    canvases[index].setAttribute(
+      "width",
+      `${(640 * dpr * vWidth) / vHeight}px`
+    );
+    canvases[index].style.height = `${640}px`;
+    canvases[index].style.width = `${(640 * vWidth) / vHeight}px`;
   }
 }
 
