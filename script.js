@@ -10,7 +10,10 @@ const playButton = document.getElementById("play");
 const stopButton = document.getElementById("pause");
 const uploadFilterButton = document.getElementById("upload-filter");
 const uploadVideoButton = document.getElementById("upload-video");
-var filterUrl = "mercury.png";
+var filterUrl1 = "glow.png";
+var filterUrl2 = "mercury.png";
+var filterUrl3 = "gray_city.png";
+var filterUrl4 = "grayscale1.png";
 var videos = [];
 videos.push(document.getElementById("video-0"));
 var canvases = [];
@@ -38,6 +41,7 @@ function onVideoLoaded(index) {
       requestAnimationFrame(rafCallback);
     };
     const shader = createShader(gls[index], VertexShader, FragmentShader);
+    // gl.viewport(-640 * 1.5, 0, 640 * 1.5 * 2, 360 * 1.5 * 2);
     requestAnimationFrame(rafCallback);
     shaders.push(shader);
   });
@@ -130,7 +134,7 @@ function uploadFilter(e) {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = () => {
-    filterUrl = reader.result;
+    filterUrl1 = reader.result;
     videos.forEach((video, index) => getFilter(index));
   };
   reader.readAsDataURL(file);
@@ -140,7 +144,10 @@ function render(index) {
   if (!lookupTexture) return;
   const gl = gls[index];
   shaders[index].bind();
-  shaders[index].uniforms.uLookup = 1;
+  shaders[index].uniforms.uLookup1 = 1;
+  shaders[index].uniforms.uLookup2 = 2;
+  shaders[index].uniforms.uLookup3 = 3;
+  shaders[index].uniforms.uLookup4 = 4;
   shaders[index].uniforms.uTexture = 0;
   shaders[index].uniforms.filterAlpha = filterAlpha / 100;
   const now = Date.now();
@@ -150,15 +157,46 @@ function render(index) {
 
 function getFilter(index) {
   return new Promise(resolve => {
-    var image = new Image();
-    image.src = filterUrl;
-    image.onload = () => {
+    //filter 1
+    var image1 = new Image();
+    image1.src = filterUrl1;
+    image1.onload = () => {
       const gl = gls[index];
       const texture = initTexture(gl, 1);
-      updateTexture(gl, image);
+      updateTexture(gl, image1);
       lookupTexture = texture;
       gl.activeTexture(gl.TEXTURE0);
-      resolve();
+      //filter 2
+      var image2 = new Image();
+      image2.src = filterUrl2;
+      image2.onload = () => {
+        const gl = gls[index];
+        const texture = initTexture(gl, 2);
+        updateTexture(gl, image2);
+        lookupTexture = texture;
+        gl.activeTexture(gl.TEXTURE0);
+        //filter 3
+        var image3 = new Image();
+        image3.src = filterUrl3;
+        image3.onload = () => {
+          const gl = gls[index];
+          const texture = initTexture(gl, 3);
+          updateTexture(gl, image3);
+          lookupTexture = texture;
+          gl.activeTexture(gl.TEXTURE0);
+          //filter 4
+          var image4 = new Image();
+          image4.src = filterUrl4;
+          image4.onload = () => {
+            const gl = gls[index];
+            const texture = initTexture(gl, 4);
+            updateTexture(gl, image4);
+            lookupTexture = texture;
+            gl.activeTexture(gl.TEXTURE0);
+            resolve();
+          };
+        };
+      };
     };
   });
 }

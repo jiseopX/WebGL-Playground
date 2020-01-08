@@ -2,12 +2,15 @@ precision mediump float;
 #define GLSLIFY 1
 
 uniform sampler2D uTexture;
-uniform sampler2D uLookup;
+uniform sampler2D uLookup1;
+uniform sampler2D uLookup2;
+uniform sampler2D uLookup3;
+uniform sampler2D uLookup4;
 uniform float filterAlpha;
 uniform float stop;
 varying vec2 vUv;
 
-vec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {
+vec4 lookup( vec4 textureColor,  sampler2D lookupTable) {
     #ifndef LUT_NO_CLAMP
         textureColor = clamp(textureColor, 0.0, 1.0);
     #endif
@@ -45,11 +48,21 @@ vec4 lookup(in vec4 textureColor, in sampler2D lookupTable) {
     return newColor* filterAlpha + textureColor*(1.0-filterAlpha);
 }
 
-void main() {
-	vec4 color = texture2D(uTexture, vUv);
+vec4 gridLookup(vec4 textureColor, vec2 vUv){
+    if(vUv.x<0.5 && vUv.y<0.5){
+        return lookup(textureColor,uLookup1);
+    }else if(vUv.x<0.5 && vUv.y>=0.5){
+        return lookup(textureColor,uLookup2);
+    }else if(vUv.x>=0.5 && vUv.y<0.5){
+        return lookup(textureColor,uLookup3);
+    }else if(vUv.x>=0.5 && vUv.y>=0.5){
+        return lookup(textureColor,uLookup4);
+    }
+}
 
-	if (vUv.x > stop)
-		gl_FragColor = lookup(color, uLookup);
-	else 
-		gl_FragColor = color;
+void main() {
+	vec4 color = texture2D(uTexture, mod(vUv*2.0,1.0));
+    vec4 outputColor = gridLookup(color, vUv);
+	gl_FragColor = outputColor;
+
 }
